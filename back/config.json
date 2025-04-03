@@ -1,0 +1,15 @@
+{
+  "ApiPath": "/api/v1",
+  "Database": {
+    "Type": "",
+    "Host": "",
+    "Port": 0,
+    "Username": "",
+    "Password": "",
+    "Database": ""
+  },
+  "Server": {
+    "Address": "0.0.0.0",
+    "Port": 7777
+  }
+}
