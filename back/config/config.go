@@ -41,7 +41,6 @@ var defaultConfif config = config{
 		Password: "",
 		Database: "",
 	},
-	
 }
 
 func ReadConfig(fileName string) config {
