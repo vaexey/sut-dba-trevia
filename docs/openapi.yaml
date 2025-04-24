@@ -1,0 +1,908 @@
+openapi: 3.0.3
+info:
+  title: Trevia
+  version: '1.0'
+  description: API spec
+servers:
+  - url: https://trevia.local/api/v1
+paths:
+  /locations/search:
+    get:
+      summary: Searches locations based on user input
+      parameters: 
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            description: The search location name
+      description: ''
+      operationId: ''
+      responses:
+        '200':
+          description: A list of location suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: unique location id
+                    name:
+                      type: string
+                      description: location name
+                    type:
+                      type: string
+                      description: location type
+                      enum: [city, country, continent]
+              examples:
+                ?query="cze":
+                  value: 
+                    - id: 12345
+                      name: "Czechy"
+                      type: "country"
+                    - id: 12346
+                      name: "Czeladź"
+                      type: "city"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "parameter 'query' is required"
+                  code:
+                    type: integer
+                    example: 400
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+      tags:
+        - locations
+  /locations/{locationId}:
+    get:
+      summary: Gives detailed info about certain location
+      parameters: 
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: The id of location that is currently getting searched
+      description: ''
+      operationId: ''
+      responses:
+        '200':
+          description: A list of location suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: unique location id
+                      example: 12345
+                    name:
+                      type: string
+                      description: location name
+                      example: Paris
+                    description:
+                      type: string
+                      description: short location description
+                      example: Paris is the capital and largest city of France. With an estimated population of 2,048,472 residents in January 2025 in an area of more than 105 km2, Paris is the fourth-most populous city in the European Union and the 30th most densely populated city in the world in 2022
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid locationId"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Location not found with id: 12345"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+      tags:
+        - locations
+  /login:
+    post:
+      summary: Creates login session and returns a token
+      description: ''
+      operationId: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "xyz"
+                password:
+                  type: string
+                  example: "veryhardpassword"
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  id:
+                    type: integer
+                    format: user_id
+                  isAdmin:
+                    type: boolean
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '401':
+          description: No authorization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                   type: string
+                   example: "not authorized"
+                  code:
+                   type: integer
+                   example: 401
+        '403':
+          description: User banned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "you are banned"
+                  code:
+                    type: integer
+                    example: 403
+      tags:
+        - users
+  /sign-up:
+    post:
+      summary: Registers an user
+      description: |
+        Registers user and returns login token if successful
+      operationId: ''
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: xyz
+                password:
+                  type: string
+                  example: veryhardpassword
+                displayName:
+                  type: string
+                  example: xyz traveller
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  id:
+                    type: integer
+                    format: user_id
+                  isAdmin:
+                    type: boolean
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+  /user:
+    get:
+      summary: Returns info about current user
+      description: ''
+      operationId: ''
+      tags:
+        - users
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1..."
+                  id:
+                    type: integer
+                    format: user_id
+                    example: 2
+                  roleId:
+                    type: integer
+                    example: 3
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+  /attractions/{locationId}:
+    get:
+      summary: Returns all attractions for certain location
+      description: ''
+      operationId: ''
+      parameters:
+        - name: locationId
+          in: path
+          description: Id of current search location
+          required: true
+          schema:
+            type: integer
+        - name: category
+          in: query
+          description: Optional filter for attractions based on category. If not provided, attractions from all categories should be returned.
+          required: false
+          schema:
+            type: string
+            enum: [restaurant, hotel, other]
+      tags:
+        - attractions
+      responses:
+        '200':
+          description: A list of attractions for certain location
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: attraction's unique id
+                    name:
+                      type: string
+                      description: attraction's name
+                    photo:
+                      type: string
+                      description: attraction's photo in binary format (bytea)
+                    rating:
+                      type: number
+                      description: attraction's average rating
+                      example: 4.67
+              examples:
+                /parisid?category="other":
+                  value: 
+                    - id: 12345
+                      name: "Notre-Dame Cathedral"
+                      photo: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+                      rating: 4.67
+                    - id: 12346
+                      name: "Eiffel Tower"
+                      photo: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+                      rating: 4.32
+  
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "no attractions found for given location"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+  /attractions/{attractionId}:
+    get:
+      summary: Returns detailed info about certain attraction
+      description: ''
+      operationId: ''
+      parameters:
+        - name: attractionId
+          in: path
+          description: Id of current attraction
+          required: true
+          schema:
+            type: integer
+      tags:
+        - attractions
+      responses:
+        '200':
+          description: Detailed attraction info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: attraction's unique id
+                    name:
+                      type: string
+                      description: attraction's name
+                    description:
+                      type: string
+                      description: attraction's description
+                    photo:
+                      type: string
+                      description: attraction's photo in binary format (bytea)
+                    rating:
+                      type: number
+                      description: attraction's average rating
+                      example: 4.67
+              examples:
+                notre-dame:
+                  value: 
+                    - id: 12345
+                      name: "Notre-Dame Cathedral"
+                      description: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos."
+                      photo: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+                      rating: 4.67
+  
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "no attractions found with given id"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+  /attractions/funfact:
+    get:
+      summary: Returns a funfact for a random attraction
+      description: ''
+      operationId: ''
+      tags:
+        - attractions
+      responses:
+        '200':
+          description: Funfact regarding a random attraction
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: attraction's unique id
+                    name:
+                      type: string
+                      description: attraction's name
+                    funfact:
+                      type: string
+                      description: attraction's description
+                    photo:
+                      type: string
+                      description: attraction's photo in binary format (bytea)
+              examples:
+                notre-dame:
+                  value: 
+                    - id: 12345
+                      name: "Notre-Dame Cathedral"
+                      funfact: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos."
+                      photo: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+  
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "no funfact found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+  /attractions:
+    post:
+      summary: Adds an attraction to the database
+      description: ''
+      operationId: ''
+      tags:
+        - attractions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: the attraction's name
+                  example: "park miejski TG"
+                description:
+                  type: string
+                  description: the attraction's description
+                  example: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Elit quisque faucibus ex sapien vitae pellentesque sem. Sem placerat in id cursus mi pretium tellus. Tellus duis convallis tempus leo eu aenean sed. Sed diam urna tempor pulvinar vivamus fringilla lacus. Lacus nec metus bibendum egestas iaculis massa nisl. Nisl malesuada lacinia integer nunc posuere ut hendrerit."
+                funfact:
+                  type: string
+                  description: funfact about the attraction
+                  example: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Elit quisque faucibus ex sapien vitae pellentesque sem. Sem placerat in id cursus mi pretium tellus."
+                photo:
+                  type: string
+                  description: photo of the attraction in a raw binary format (bytea)
+                  example: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+                locationId:
+                  type: integer
+                  description: id of the attraction's location
+                  example: 137
+                type:
+                  type: string
+                  description: location's type
+                  enum: [restaurant, hotel, other]
+                  example: restaurant
+      responses:
+        '200':
+          description: added attraction successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: current attraction's id
+                    example: 132
+                  name:
+                    type: string
+                    description: the attraction's name
+                    example: "park miejski TG"
+                  description:
+                    type: string
+                    description: the attraction's description
+                    example: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Elit quisque faucibus ex sapien vitae pellentesque sem. Sem placerat in id cursus mi pretium tellus. Tellus duis convallis tempus leo eu aenean sed. Sed diam urna tempor pulvinar vivamus fringilla lacus. Lacus nec metus bibendum egestas iaculis massa nisl. Nisl malesuada lacinia integer nunc posuere ut hendrerit."
+                  funfact:
+                    type: string
+                    description: funfact about the attraction
+                    example: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Elit quisque faucibus ex sapien vitae pellentesque sem. Sem placerat in id cursus mi pretium tellus."
+                  photo:
+                    type: string
+                    description: photo of the attraction in a raw binary format (bytea)
+                    example: "iVBORw0KGgoAAAANSUhEUgAAAoAAAAGQCAYAAABVt..."
+                  locationId:
+                    type: integer
+                    description: id of the attraction's location
+                    example: 137
+                  type:
+                    type: string
+                    description: location's type
+                    enum: [restaurant, hotel, other]
+                    example: other
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "internal server error"
+                  code:
+                    type: integer
+                    example: 500
+      
+  /comments/{attractionId}:
+    get:
+      summary: Returns comments regarding certain attraction
+      description: ''
+      operationId: ''
+      parameters:
+        - name: attractionId
+          in: path
+          description: Id of current attraction
+          required: true
+          schema:
+            type: integer
+      tags:
+        - comments
+      responses:
+        '200':
+          description: User's comments regarding current attraction
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      description: user's username
+                    comment:
+                      type: string
+                      description: user's comment
+              examples:
+                notre-dame:
+                  value: 
+                    - username: userX
+                      comment: great views
+                    - username: userY
+                      comment: lovely place
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "no attractions found with given id"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "unexpected server error"
+                  code:
+                    type: integer
+                    example: 500
+  /comments:
+    post:
+      summary: Adds a comment to the current attraction
+      description: ''
+      operationId: ''
+      tags:
+        - comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attractionId:
+                  type: integer
+                  description: the attraction's id
+                  example: 123
+                userId:
+                  type: integer
+                  description: commenting user's id
+                  example: 1234
+                username:
+                  type: string
+                  description: the commenting user's username
+                  example: userX
+                comment:
+                  type: string
+                  description: the user's comment
+                  example: great views
+      responses:
+        '200':
+          description: added comment successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attractionId:
+                    type: integer
+                    description: current attraction's id
+                  userId:
+                    type: integer
+                    description: commenting user's id
+                  username:
+                    type: string
+                    description: commenting user's username
+                  comment:
+                    type: string
+                    description: the comment
+              examples:
+                example1:
+                  value:
+                    attractionId: 123
+                    userId: 1234
+                    username: userX
+                    comment: "great views"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "internal server error"
+                  code:
+                    type: integer
+                    example: 500
+  /rate:
+    post:
+      summary: Adds a rating for the current attraction
+      description: ''
+      operationId: ''
+      tags:
+        - rating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attractionId:
+                  type: integer
+                  description: the attraction's id
+                  example: 123
+                userId:
+                  type: integer
+                  description: commenting user's id
+                  example: 1234
+                rating:
+                  type: integer
+                  description: the given rating
+                  example: 3
+      responses:
+        '200':
+          description: added rating successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attractionId:
+                    type: integer
+                    description: the attraction's id
+                    example: 123
+                  userId:
+                    type: integer
+                    description: commenting user's id
+                    example: 1234
+                  rating:
+                    type: integer
+                    description: the given rating
+                    example: 3
+              
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "invalid request"
+                  code:
+                    type: integer
+                    example: 400
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "internal server error"
+                  code:
+                    type: integer
+                    example: 500
