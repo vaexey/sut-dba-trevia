@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"strconv"
 )
 
 var Config = ReadConfig("config.json")
@@ -27,7 +28,7 @@ type serverConfig struct {
 	Port    int
 }
 
-var defaultConfif config = config{
+var defaultConfig config = config{
 	ApiPath: "/api/v1",
 	Server: serverConfig{
 		Address: "0.0.0.0",
@@ -47,15 +48,17 @@ func ReadConfig(fileName string) config {
 	var config config
 	configAsString, err := os.ReadFile(fileName)
 	if err != nil {
-		writeConfig(fileName, defaultConfif)
-		return defaultConfif
+		writeConfig(fileName, defaultConfig)
+		updateConfigFromEnv(&defaultConfig)
+		return defaultConfig
 	}
 
 	err = json.Unmarshal(configAsString, &config)
 	if err != nil {
-		return defaultConfif
+		return defaultConfig
 	}
 
+	updateConfigFromEnv(&config)
 	return config
 }
 
@@ -71,4 +74,32 @@ func writeConfig(filename string, config config) error {
 	return nil
 }
 
+func updateConfigFromEnv(conf *config){
+	updateConfigField("DATABASE_HOST", func(value string){
+		conf.Database.Host = value
+	})
 
+	updateConfigField("DATABASE_USERNAME", func(value string){
+		conf.Database.Username = value
+	})
+
+	updateConfigField("DATABASE_PASSWORD", func(value string){
+		conf.Database.Password = value
+	})
+
+	updateConfigField("DATABASE_NAME", func(value string){
+		conf.Database.Database = value
+	})
+
+	updateConfigField("DATABASE_PORT", func(value string){
+		if valueAsInteger, err := strconv.Atoi(value); err != nil{
+			conf.Database.Port = valueAsInteger
+		}
+	})
+}
+
+func updateConfigField(envKey string, updateFunc func(string)){
+	if envValue := os.Getenv(envKey); envKey != "" {
+		updateFunc(envValue)
+	}
+}

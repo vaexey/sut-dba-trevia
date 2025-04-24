@@ -1,12 +1,12 @@
 {
   "ApiPath": "/api/v1",
   "Database": {
-    "Type": "",
-    "Host": "",
-    "Port": 0,
-    "Username": "",
-    "Password": "",
-    "Database": ""
+    "Type": "postgres",
+    "Host": "db",
+    "Port": 5432,
+    "Username": "docker",
+    "Password": "root",
+    "Database": "docker"
   },
   "Server": {
     "Address": "0.0.0.0",
