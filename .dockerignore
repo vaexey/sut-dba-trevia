@@ -1,0 +1,7 @@
+.*
+docs
+back/*
+!back/go.mod
+!back/go.sum
+!back/**/*.go
+db
