@@ -2,7 +2,7 @@ services:
   web:
     build: .
     ports:
-      - 8080:6969
+      - 8080:7777
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
