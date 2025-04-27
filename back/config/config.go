@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -94,6 +95,7 @@ func updateConfigFromEnv(conf *config){
 	updateConfigField("DATABASE_PORT", func(value string){
 		if valueAsInteger, err := strconv.Atoi(value); err != nil{
 			conf.Database.Port = valueAsInteger
+			fmt.Print("err")
 		}
 	})
 }
