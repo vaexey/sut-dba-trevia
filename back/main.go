@@ -23,7 +23,7 @@ func main() {
 	connectionString := fmt.Sprintf(
 		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable", 
 		config.Config.Database.Host,
-		5432,
+		config.Config.Database.Port,
 		config.Config.Database.Username,
 		config.Config.Database.Database,
 		config.Config.Database.Password,
@@ -58,15 +58,7 @@ func main() {
 		})
 		
 		api.POST("/login", auth.HandleLogin)
-		api.GET("/config", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{
-				"Host": config.Config.Database.Host,
-				"Port": config.Config.Database.Port,
-				"Username": config.Config.Database.Username,
-				"Password": config.Config.Database.Password,
-				"Name": config.Config.Database.Database,
-			})
-		})
+
 		api.Use(auth.AuthMiddleware()) 
 		{
 			// TODO: auth endpoints 
