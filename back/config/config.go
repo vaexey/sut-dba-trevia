@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -33,7 +32,7 @@ var defaultConfig config = config{
 	ApiPath: "/api/v1",
 	Server: serverConfig{
 		Address: "0.0.0.0",
-		Port: 7777,		
+		Port: 7777,
 	},
 	Database: databaseConfig{
 		Type: "",
@@ -60,6 +59,7 @@ func ReadConfig(fileName string) config {
 	}
 
 	updateConfigFromEnv(&config)
+
 	return config
 }
 
@@ -93,15 +93,14 @@ func updateConfigFromEnv(conf *config){
 	})
 
 	updateConfigField("DATABASE_PORT", func(value string){
-		if valueAsInteger, err := strconv.Atoi(value); err != nil{
-			conf.Database.Port = valueAsInteger
-			fmt.Print("err")
+		if port, err := strconv.Atoi(value); err == nil{
+			conf.Database.Port = port
 		}
 	})
 }
 
 func updateConfigField(envKey string, updateFunc func(string)){
-	if envValue := os.Getenv(envKey); envKey != "" {
+	if envValue := os.Getenv(envKey); envValue != "" {
 		updateFunc(envValue)
 	}
 }
