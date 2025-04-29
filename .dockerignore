@@ -4,4 +4,5 @@ back/*
 !back/go.mod
 !back/go.sum
 !back/**/*.go
+!back/nginx.conf
 db
