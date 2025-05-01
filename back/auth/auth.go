@@ -1,87 +1,75 @@
 package auth
 
 import (
+	"back/config"
+	"back/db"
+	"fmt"
 	"net/http"
-	"time"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const secretKey  = ""
+var secretKey  = config.Config.SecretKey
 
-type loginRequestBody struct {
-	Login    string
-	Password string
+type Handler struct{
+	Db *db.Database
 }
 
-func HandleLogin(c *gin.Context) {
-	var loginRequestBody loginRequestBody
+func (h *Handler) RequireJWT() gin.HandlerFunc {
+	return func(c *gin.Context){
+		tokenHeader := c.GetHeader("Authorization")
 
-	if err := c.ShouldBindJSON(&loginRequestBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
+		if tokenHeader == ""{
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Authorization header does not exists",
+			})
+			c.Abort()
+			return
+		}
 
-	// TODO: retrieve user from the database, validate credentials, and determine role (change commented code block)
+		authHeaderParts := strings.Split(tokenHeader, " ")
 
-	var role string
-	// if loginRequestBody.Login == "admin" && loginRequestBody.Password == "password" {
-	//  role = "admin"
-	// } else if loginRequestBody.Login == "user" && loginRequestBody.Password == "password" {
-	//  role = "user"
-	// } else {
-	//  c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-	//  return
-	// }
+		if len(authHeaderParts) != 2 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message":"Header contains an invalid number of segments",
+			})
+			c.Abort()
+			return
+		}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": loginRequestBody.Login,
-		"role":     role,
-		"exp":      time.Now().Add(time.Hour * 1).Unix(),
-	})
+		authorizationType := authHeaderParts[0]
+		tokenString := authHeaderParts[1]
 
-	tokenString, err := token.SignedString([]byte(secretKey))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
-		return
-	}
+		if authorizationType != "Bearer" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Header contains an invalid number of segments",
+			})
+			c.Abort()
+			return
+		}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
-}
-
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-
-		// parse token
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, http.ErrAbortHandler
 			}
 			return []byte(secretKey), nil
 		})
 
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing"})
-			c.Abort()
-			return
-		}
-
 		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"message": fmt.Sprintf("%s", err),
 			})
 			c.Abort()
 			return
 		}
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("claims", claims)
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"message":"Bad claims",
 			})
 			c.Abort()
 			return
@@ -91,19 +79,26 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func AdminMiddleware() gin.HandlerFunc {
+func (h *Handler) RequireModerator() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		claims := c.MustGet("claims").(jwt.MapClaims)
-		role := claims["role"].(string)
-
-		if role != "admin" {
+		if !CtxIsModerator(c) {
 			c.JSON(http.StatusForbidden, gin.H{
-				"error": "Forbidden",
+				"message": "Moderator access only",
 			})
 			c.Abort()
 			return
 		}
+	}
+}
 
-		c.Next()
+func (h *Handler) RequireAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !CtxIsAdmin(c) {
+			c.JSON(http.StatusForbidden, gin.H{
+				"message": "Admin access only",
+			})
+			c.Abort()
+			return
+		}
 	}
 }

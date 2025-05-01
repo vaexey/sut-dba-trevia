@@ -2,9 +2,9 @@ package model
 
 type User struct {
 	Id                uint   `gorm:"primaryKey"`
-	Login             string `gorm:"unique"`
+	Username          string `gorm:"unique"`
 	Password          string
-	Name              string
+	DisplayName       string
 	Attractions       []Attraction       `gorm:"foreignKey:UserId"` // attraction
 	AttractionReports []AttractionReport `gorm:"foreignKey:UserId"` // attraction reports
 	Ratings           []Rating           `gorm:"foreignKey:UserId"` // ratings

@@ -9,27 +9,29 @@ import (
 var Config = ReadConfig("config.json")
 
 type config struct {
-	ApiPath string
-	Database databaseConfig
-	Server   serverConfig
+	ApiPath string 			`json:"ApiPath"`
+	SecretKey string 		`json:"SecretKey"`
+	Database databaseConfig `json:"Database"`
+	Server   serverConfig 	`json:"Server"`
 }
 
 type databaseConfig struct {
-	Type     string
-	Host     string
-	Port     int
-	Username string
-	Password string
-	Database string
+	Type     string `json:"Type"`
+	Host     string `json:"Host"`
+	Port     int 	`json:"Port"`
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Database string `json:"Database"`
 }
 
 type serverConfig struct {
-	Address string
-	Port    int
+	Address string 	`json:"Address"`
+	Port    int 	`json:"Port"`
 }
 
 var defaultConfig config = config{
 	ApiPath: "/api/v1",
+	SecretKey: "",
 	Server: serverConfig{
 		Address: "0.0.0.0",
 		Port: 7777,
@@ -59,7 +61,6 @@ func ReadConfig(fileName string) config {
 	}
 
 	updateConfigFromEnv(&config)
-
 	return config
 }
 

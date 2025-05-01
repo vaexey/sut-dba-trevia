@@ -1,5 +1,6 @@
 {
   "ApiPath": "/api/v1",
+  "SecretKey": "",
   "Database": {
     "Type": "postgres",
     "Host": "db",

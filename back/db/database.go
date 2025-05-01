@@ -8,12 +8,15 @@ import (
 
 type Database struct {
 	Db *gorm.DB
-	
+	Role roleService
+	User userService
 }
 
 func NewDatabase(Db *gorm.DB) Database{
 	return Database{
 		Db: Db,
+		Role: roleService{Db: Db},
+		User: userService{Db: Db},
 	}
 }
 
@@ -30,4 +33,12 @@ func (d *Database) Migrate() error {
 		&model.Role{},
 		&model.User{},
 	)
+}
+
+type roleService struct {
+	Db *gorm.DB
+}
+
+type userService struct {
+	Db *gorm.DB
 }

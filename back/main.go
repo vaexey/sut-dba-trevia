@@ -51,17 +51,20 @@ func main() {
 		panic("failed to create a database" + err.Error())
 	}
 
+	authHandler := auth.Handler{
+		Db: &database,
+	}
+
+	authMiddleware := authHandler.RequireJWT()
+
 	api := router.Group(config.Config.ApiPath)
 	{
-		api.GET("/hello", func(ctx *gin.Context){
-			ctx.JSON(http.StatusOK, gin.H{"msg": "Hello world"})
-		})
-		
-		api.POST("/login", auth.HandleLogin)
+		api.POST("/login", authHandler.Login)
+		api.POST("/sign-up", authHandler.Register)
 
-		api.Use(auth.AuthMiddleware()) 
+		api.Use(authMiddleware) 
 		{
-			// TODO: auth endpoints 
+			//TODO: auth endpoints 
 		}
 	}
 
