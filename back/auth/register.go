@@ -50,7 +50,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 	
 	var userRole model.Role
-	userRole, err = h.Db.Role.SelectRoleByName("user")
+	userRole, err = h.Db.Role.SelectByName("user")
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message":"Service failure",
@@ -75,7 +75,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	// insert user to database
-	id, err := h.Db.User.CreateUser(newUser)
+	id, err := h.Db.User.Create(newUser)
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"message":"Service failure",

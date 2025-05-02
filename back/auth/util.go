@@ -2,6 +2,7 @@ package auth
 
 import (
 	"regexp"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -18,27 +19,40 @@ func (h *Handler) CompareHash(password string, hashedPassword string) bool {
 	return err == nil
 }
 
-func CtxIs(c *gin.Context) string {
+func ContextRole(c *gin.Context) string {
 	claims := c.MustGet("claims").(jwt.MapClaims)
 	role := claims["role"].(string)
 	
 	return role
 }
 
-func CtxIsModerator(c *gin.Context) bool {
-	role := CtxIs(c)
+func ContextIsModerator(c *gin.Context) bool {
+	role := ContextRole(c)
 	return role == "moderator"
 }
 
-func CtxIsAdmin(c *gin.Context) bool {
-	role := CtxIs(c)
+func ContextIsAdmin(c *gin.Context) bool {
+	role := ContextRole(c)
 	return role == "admin"
 }
 
-func CtxId(c *gin.Context) *uint {
+func ContextId(c *gin.Context) *uint {
 	claims := c.MustGet("claims").(jwt.MapClaims)
 	id := uint(claims["id"].(float64))
 	return &id
+}
+
+func CreateTokenString(username string, userId uint, userRole string, secretKey string) (string, error) {
+	// create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username" : username,
+		"id": userId,
+		"role": userRole,
+		"exp": time.Now().Add(time.Hour * 1).Unix(),	
+	})
+
+	tokenstring, err := token.SignedString([]byte(secretKey))
+	return tokenstring, err
 }
 
 func isUsernameValid(name string) bool {

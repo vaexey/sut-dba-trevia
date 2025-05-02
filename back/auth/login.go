@@ -3,10 +3,8 @@ package auth
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
@@ -42,8 +40,8 @@ func (h *Handler) login(username string, password string) (int, gin.H, *string) 
 	}
 
 	var role string = "user"
-	moderatorRole, moderatorErr := h.Db.Role.SelectRoleByName("moderator")
-	adminRole, adminErr := h.Db.Role.SelectRoleByName("admin")
+	moderatorRole, moderatorErr := h.Db.Role.SelectByName("moderator")
+	adminRole, adminErr := h.Db.Role.SelectByName("admin")
 	if moderatorErr != nil || adminErr != nil {
 		return http.StatusServiceUnavailable, gin.H{ "message":"Service failure", }, nil
 	}
@@ -54,16 +52,7 @@ func (h *Handler) login(username string, password string) (int, gin.H, *string) 
 		role = "admin"
 	}
 
-	// create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username" : username,
-		"id": dbUser.Id,
-		"role": role,
-		"exp": time.Now().Add(time.Hour * 1).Unix(),	
-	})
-
-	// sign and get encoded token as string
-	tokenString, err := token.SignedString([]byte(secretKey))
+	tokenString, err := CreateTokenString(username, dbUser.Id, role, secretKey)
 	if err != nil {
 		return http.StatusServiceUnavailable, gin.H { "message" : "Service failure" }, nil
 	}
@@ -88,7 +77,7 @@ func (h *Handler) Login(c *gin.Context) {
 	isModerator := false
 	isAdmin := false
 
-	if	json["role"] == "moderator" || json["role"] == "admin" {
+	if	json["role"] == "moderator" {
 		isModerator = true
 	}
 	if (json["role"] == "admin") {

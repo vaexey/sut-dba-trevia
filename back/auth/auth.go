@@ -81,7 +81,7 @@ func (h *Handler) RequireJWT() gin.HandlerFunc {
 
 func (h *Handler) RequireModerator() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !CtxIsModerator(c) {
+		if !ContextIsModerator(c) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"message": "Moderator access only",
 			})
@@ -93,7 +93,7 @@ func (h *Handler) RequireModerator() gin.HandlerFunc {
 
 func (h *Handler) RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !CtxIsAdmin(c) {
+		if !ContextIsAdmin(c) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"message": "Admin access only",
 			})

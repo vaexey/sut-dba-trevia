@@ -4,6 +4,7 @@ import (
 	"back/auth"
 	"back/config"
 	"back/db"
+	"back/routes"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -57,6 +58,8 @@ func main() {
 
 	authMiddleware := authHandler.RequireJWT()
 
+	routes := routes.NewApi(&database)
+
 	api := router.Group(config.Config.ApiPath)
 	{
 		api.POST("/login", authHandler.Login)
@@ -64,7 +67,7 @@ func main() {
 
 		api.Use(authMiddleware) 
 		{
-			//TODO: auth endpoints 
+			api.GET("/user", routes.GetCurrentUser)
 		}
 	}
 
