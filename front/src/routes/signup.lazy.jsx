@@ -2,24 +2,24 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import "../styles/Auth.css"; // Import the CSS file
 
-export const Route = createLazyFileRoute("/login")({
-  component: Login,
+export const Route = createLazyFileRoute("/signup")({
+  component: SignUp,
 });
 
-function Login() {
+function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleSignUp = (e) => {
     e.preventDefault();
-    console.log("Login attempt with:", { email, password });
-    // todo: login logic
+    console.log("Sign-up attempt with:", { email, password });
+    // todo: sign-up logic
   };
 
   return (
     <div className="auth-container">
-      <h1 className="auth-title">Login</h1>
-      <form onSubmit={handleLogin} className="auth-form">
+      <h1 className="auth-title">Sign Up</h1>
+      <form onSubmit={handleSignUp} className="auth-form">
         <input
           type="email"
           placeholder="Email"
@@ -37,13 +37,13 @@ function Login() {
           required
         />
         <button type="submit" className="auth-button">
-          Login
+          Sign Up
         </button>
       </form>
       <p className="auth-redirect-text">
-        Don't have an account?{" "}
-        <Link to="/signup" className="auth-link">
-          Sign Up
+        Already have an account?{" "}
+        <Link to="/login" className="auth-link">
+          Login
         </Link>
       </p>
     </div>

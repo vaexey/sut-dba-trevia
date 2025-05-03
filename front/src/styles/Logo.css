@@ -1,0 +1,24 @@
+.logo-area {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.text-logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.text-logo-img {
+  width: 300px;
+  cursor: pointer;
+}
+
+.logo-img {
+  width: 70px;
+}
