@@ -9,3 +9,13 @@ func (rh *regionService) SelectById(id uint) (model.Region, error) {
 	}
 	return region, nil
 }
+
+func (rh *regionService) SelectByNameFragment(nameFragment string) ([]model.Region, error) {
+	var regions []model.Region
+	pattern := nameFragment + "%"
+	err := rh.Db.Preload("RegionType").Where("name ILIKE ?", pattern).Find(&regions).Error
+	if err != nil {
+		return nil, err
+	}
+	return regions, nil
+}

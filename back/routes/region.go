@@ -54,3 +54,45 @@ func (a *Api) LocationsById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+type loactionSearchResponse struct {
+	Id uint `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+func (a *Api) LocationSearch(c *gin.Context) {
+	searchQuery := c.Query("query")
+	if searchQuery == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Parameter 'query' is required",
+		})
+		return
+	}
+
+	regions, err := a.Db.Region.SelectByNameFragment(searchQuery)
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "Service failure",
+		})
+		return
+	}
+
+	if len(regions) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Not found",
+		})
+		return
+	}
+
+	var response []loactionSearchResponse
+	for _, element := range regions {
+		response = append(response, loactionSearchResponse{
+			Id: element.Id,
+			Name: element.Name,
+			Type: element.RegionType.Name,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
