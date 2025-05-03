@@ -62,14 +62,29 @@ func main() {
 
 	api := router.Group(config.Config.ApiPath)
 	{
+		// user
 		api.POST("/login", authHandler.Login)
 		api.POST("/sign-up", authHandler.Register)
+
+		// loaction 
 		api.GET("/locations/:locationId", routes.LocationsById)
 		api.GET("/locations/search", routes.LocationSearch)
 
+		// attractions
+		api.GET("/attractions/:attractionId", routes.AttractionById)
+		api.GET("/attractions/location/:locationId", routes.AttractionByLocation)
+		api.GET("/attractions/funfact", routes.AttractionWithRandomFunFact)
+
 		api.Use(authMiddleware) 
 		{
+			// user
 			api.GET("/user", routes.GetCurrentUser)
+
+			// attraction 
+			api.POST("/attractions", routes.CreateAttraction)
+
+			// rating
+			api.POST("/rate", routes.CreateRating)
 		}
 	}
 
