@@ -64,6 +64,7 @@ func main() {
 	{
 		api.POST("/login", authHandler.Login)
 		api.POST("/sign-up", authHandler.Register)
+		api.GET("/locations/:locationId", routes.LocationsById)
 
 		api.Use(authMiddleware) 
 		{

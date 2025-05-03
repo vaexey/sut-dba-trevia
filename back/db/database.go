@@ -10,6 +10,7 @@ type Database struct {
 	Db *gorm.DB
 	Role roleService
 	User userService
+	Region regionService
 }
 
 func NewDatabase(Db *gorm.DB) Database{
@@ -17,6 +18,7 @@ func NewDatabase(Db *gorm.DB) Database{
 		Db: Db,
 		Role: roleService{Db: Db},
 		User: userService{Db: Db},
+		Region: regionService{Db: Db},
 	}
 }
 
@@ -40,5 +42,9 @@ type roleService struct {
 }
 
 type userService struct {
+	Db *gorm.DB
+}
+
+type regionService struct {
 	Db *gorm.DB
 }

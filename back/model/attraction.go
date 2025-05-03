@@ -27,8 +27,4 @@ type Attraction struct {
 
 	//comments
 	Comments []Comment `gorm:"foreignKey:AttractionId"`
-
-	// role
-	RoleId uint
-	Role   Role `gorm:"foreignKey:RoleId"`
 }
