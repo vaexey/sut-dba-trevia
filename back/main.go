@@ -80,7 +80,7 @@ func main() {
 			// user
 			api.GET("/user", routes.GetCurrentUser)
 
-			// attraction 
+			// attractions
 			api.POST("/attractions", routes.CreateAttraction)
 
 			// rating

@@ -37,7 +37,7 @@ func (a *Api) CreateRating(c *gin.Context) {
 	}
 
 	// check if user already likes this attraction
-	userRatings, err := a.Db.Rating.SelectByUserId(*auth.ContextId(c))
+	userRatings, err := a.Db.Rating.SelectAllByUserId(*auth.ContextId(c))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message":"User not found",

@@ -4,6 +4,7 @@ import (
 	"back/auth"
 	"back/model"
 	"errors"
+	"math"
 	mrand "math/rand"
 	"net/http"
 	"strconv"
@@ -17,7 +18,7 @@ type attractionByIdResponse struct {
 	Name string 		`json:"name"`
 	Description string 	`json:"description"`
 	Photo string 		`json:"photo"`
-	Rating float32 		`json:"rating"`
+	Rating float64 		`json:"rating"`
 }
 
 func (a *Api) AttractionById(c *gin.Context) {
@@ -48,12 +49,25 @@ func (a *Api) AttractionById(c *gin.Context) {
 
 	//TODO: add calculating the average rating
 
+	ratings, err := a.Db.Rating.SelectAllByAttractionId(uint(attractionId))
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message":"Service failure",
+		})
+		return
+	}
+
+	avg := calculateAverageRating(ratings)
+	if len(ratings) == 0 {
+		avg = 0.0
+	}
+
 	response := attractionByIdResponse{
 		Id: attraction.Id,
 		Name: attraction.Name,
 		Description: attraction.Description,
 		Photo: attraction.Photo,
-		Rating: 0.0,
+		Rating: avg,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -196,7 +210,7 @@ func (a *Api) AttractionByLocation(c *gin.Context) {
 	var response []attractionByLocationResponse
 
 	for _, item := range attractions {
-		//TODO: add counting average rating for each item 
+		//TODO: add counting average rating for each item
 		response = append(response, attractionByLocationResponse{
 			Id: item.Id,
 			Name: item.Name,
@@ -210,4 +224,13 @@ func (a *Api) AttractionByLocation(c *gin.Context) {
 
 func generateRandomNumberInRange(min, max uint) uint {
     return uint(mrand.Intn(int(max-min+1)) + int(min))
+}
+
+func calculateAverageRating(ratings []model.Rating) float64{
+	sum := 0.0;
+	for _, item := range ratings {
+		sum += float64(item.Rating)
+	}
+	avg := sum / float64(len(ratings))
+	return math.Round(avg*100) / 100
 }
