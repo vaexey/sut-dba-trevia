@@ -47,20 +47,8 @@ func (a *Api) AttractionById(c *gin.Context) {
 		return
 	}
 
-	//TODO: add calculating the average rating
-
-	ratings, err := a.Db.Rating.SelectAllByAttractionId(uint(attractionId))
-	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"message":"Service failure",
-		})
-		return
-	}
-
-	avg := calculateAverageRating(ratings)
-	if len(ratings) == 0 {
-		avg = 0.0
-	}
+	// calculate average rating 
+	avg := averageRating(uint(attractionId), c, a)
 
 	response := attractionByIdResponse{
 		Id: attraction.Id,
@@ -145,8 +133,6 @@ func (a *Api) CreateAttraction(c *gin.Context) {
 		return
 	}
 	
-	// check if location exists
-
 	newAttraction := model.Attraction{
 		Name: request.Name,
 		Description: request.Description,
@@ -206,16 +192,18 @@ func (a *Api) AttractionByLocation(c *gin.Context) {
 		})
 		return
 	}
-
+	
 	var response []attractionByLocationResponse
 
 	for _, item := range attractions {
-		//TODO: add counting average rating for each item
+		// calculate average rating
+		avg := averageRating(item.Id, c, a)
+
 		response = append(response, attractionByLocationResponse{
 			Id: item.Id,
 			Name: item.Name,
 			Photo: item.Photo,
-			Rating: 0.0,
+			Rating: float32(avg),
 		})
 	}
 
@@ -233,4 +221,18 @@ func calculateAverageRating(ratings []model.Rating) float64{
 	}
 	avg := sum / float64(len(ratings))
 	return math.Round(avg*100) / 100
+}
+
+func averageRating(attractionId uint, c *gin.Context, a *Api) float64{
+	ratings, err := a.Db.Rating.SelectAllByAttractionId(attractionId)
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message":"Service failure",
+		})
+	}
+	avg := calculateAverageRating(ratings)
+	if len(ratings) == 0 {
+		avg = 0.0
+	}
+	return avg
 }
