@@ -199,14 +199,6 @@ func (a *Api) AttractionByLocation(c *gin.Context) {
 		}
 	}
 
-	// attractions, err := a.Db.Attraction.SelectAllByLocationId(uint(locationId)) 
-	// if err != nil {
-	// 	c.JSON(http.StatusServiceUnavailable, gin.H{
-	// 		"message":"Service failure",
-	// 	})
-	// 	return
-	// }
-
 	if len(attractions) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"message":"No attractions found for given location",
