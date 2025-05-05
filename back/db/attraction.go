@@ -21,6 +21,20 @@ func (ah *attractionService) SelectAllByLocationId(id uint) ([]model.Attraction,
 	return attractionsWithFunFact, nil
 }
 
+func (ah *attractionService) SelectAllByLocationIdAndCategory(id uint, category string) ([]model.Attraction, error) {
+	var attractionsWithFunFact []model.Attraction
+	err := ah.Db.Joins("JOIN attraction_types ON attraction_types.id = attractions.attraction_type_id").
+    	Where("attractions.region_id = ? AND attraction_types.name = ?", id, category).
+    	Preload("AttractionType").
+    	Find(&attractionsWithFunFact).Error
+
+
+	if err != nil {
+		return nil, err
+	}
+	return attractionsWithFunFact, nil
+}
+
 func (ah *attractionService) SelectAllWithFunFact() ([]model.Attraction, error) {
 	var attractionsWithFunFact []model.Attraction
 	err := ah.Db.Where("fun_fact IS NOT NULL AND fun_fact != ''").
