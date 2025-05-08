@@ -1,37 +1,61 @@
 .util-buttons {
-    position: absolute;
-    top: 1.7rem;
-    right: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem; 
+  position: absolute;
+  top: 1.7rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.util-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.util-buttons button:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.util-buttons button:active {
+  background-color: #1e7e34;
+  transform: scale(0.95);
+}
+
+.util-buttons button svg {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.logout-message {
+  position: absolute;
+  top: 100%;
+  left: -20%;
+  transform: translateX(-50%);
+  color: green;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  animation: fadeOut 3s forwards;
+  white-space: nowrap;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
   }
-  
-  .util-buttons button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1rem;
-    background-color: #28a745; 
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  100% {
+    opacity: 0;
   }
-  
-  .util-buttons button:hover {
-    background-color: #218838; 
-    transform: scale(1.05); 
-  }
-  
-  .util-buttons button:active {
-    background-color: #1e7e34; 
-    transform: scale(0.95); 
-  }
-  
-  .util-buttons button svg {
-    margin-right: 0.5rem; 
-    font-size: 1.2rem; 
-  }
+}
