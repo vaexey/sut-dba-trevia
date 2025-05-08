@@ -1,22 +1,19 @@
-import legitReactLogo from "./legitReactLogo.png";
-import "./App.css";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { routeTree } from "./routeTree.gen";
+import "../src/App.css";
 
-function App() {
+const router = createRouter({ routeTree });
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={legitReactLogo} className="App-logo" alt="logo" />
-        <a
-          className="App-link"
-          href="https://youtu.be/dQw4w9WgXcQ"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TAB jadziem
-        </a>
-      </header>
-    </div>
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
   );
-}
+};
 
-export default App;
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(<App />);
