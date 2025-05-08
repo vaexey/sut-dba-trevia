@@ -1,0 +1,16 @@
+{
+  "ApiPath": "/api/v1",
+  "SecretKey": "",
+  "Database": {
+    "Type": "postgres",
+    "Host": "db",
+    "Port": 5432,
+    "Username": "docker",
+    "Password": "root",
+    "Database": "docker"
+  },
+  "Server": {
+    "Address": "0.0.0.0",
+    "Port": 7777
+  }
+}
