@@ -15,14 +15,14 @@ import (
 )
 
 func main() {
-	
+
 	router := gin.New()
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
 	connectionString := fmt.Sprintf(
-		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable", 
+		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		config.Config.Database.Host,
 		config.Config.Database.Port,
 		config.Config.Database.Username,
@@ -32,17 +32,17 @@ func main() {
 
 	dbConn, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
-    	panic("failed to create database connection: " + err.Error())
+		panic("failed to create database connection: " + err.Error())
 	}
 
 	sqlDB, err := dbConn.DB()
 	if err != nil {
-    	panic("failed to get database instance: " + err.Error())
+		panic("failed to get database instance: " + err.Error())
 	}
 
 	err = sqlDB.Ping()
 	if err != nil {
-    	panic("failed to ping database: " + err.Error())
+		panic("failed to ping database: " + err.Error())
 	}
 
 	database := db.NewDatabase(dbConn)
@@ -66,7 +66,7 @@ func main() {
 		api.POST("/login", authHandler.Login)
 		api.POST("/sign-up", authHandler.Register)
 
-		// loaction 
+		// loaction
 		api.GET("/locations/:locationId", routes.LocationsById)
 		api.GET("/locations/search", routes.LocationSearch)
 
@@ -75,7 +75,7 @@ func main() {
 		api.GET("/attractions/location/:locationId", routes.AttractionByLocation)
 		api.GET("/attractions/funfact", routes.AttractionWithRandomFunFact)
 
-		api.Use(authMiddleware) 
+		api.Use(authMiddleware)
 		{
 			// user
 			api.GET("/user", routes.GetCurrentUser)
@@ -85,6 +85,10 @@ func main() {
 
 			// rating
 			api.POST("/rate", routes.CreateRating)
+
+			//comment
+			api.POST("/comments", routes.CreateComment)
+			api.GET("/comments/:attractionId", routes.GetComments)
 		}
 	}
 
