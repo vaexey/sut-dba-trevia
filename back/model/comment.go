@@ -6,4 +6,7 @@ type Comment struct {
 	AttractionId   uint
 	Attraction     Attraction      `gorm:"foreignKey:AttractionId"`
 	CommentReports []CommentReport `gorm:"foreignKey:CommentId"`
+	UserId         uint
+	User           User `gorm:"foreignKey:UserId"`
+	Comment		   string
 }
