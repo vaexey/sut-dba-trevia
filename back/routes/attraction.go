@@ -151,7 +151,16 @@ func (a *Api) CreateAttraction(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, newAttraction)
+	reponse := createAttractionResponse{
+		Name: newAttraction.Name,
+		Description: newAttraction.Description,
+		Funfact: newAttraction.FunFact,
+		Photo: newAttraction.Photo,
+		LocationId: request.LocationId,
+		Type: request.Type,
+	}
+
+	c.JSON(http.StatusOK, reponse)
 }
 
 type attractionByLocationResponse struct {
@@ -180,38 +189,33 @@ func (a *Api) AttractionByLocation(c *gin.Context) {
 
 	category := c.Query("category")
 
+	// get recursive regions' ids
+	regionIds, err := selectAllRegionsIds(a, uint(locationId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to gather region hierarchy"})
+		return
+	}
+
 	var attractions []model.Attraction
 	if category == "" {
-		attractions, err = a.Db.Attraction.SelectAllByLocationId(uint(locationId)) 
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"message":"Service failure",
-			})
-			return
-		}
+		attractions, err = a.Db.Attraction.SelectAllByRegionIds(regionIds)
 	} else {
-		attractions, err = a.Db.Attraction.SelectAllByLocationIdAndCategory(uint(locationId), category) 
-		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{
-				"message":"Service failure",
-			})
-			return
-		}
+		attractions, err = a.Db.Attraction.SelectAllByRegionIdsAndCategory(regionIds, category)
+	}
+
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"message": "Service failure"})
+		return
 	}
 
 	if len(attractions) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message":"No attractions found for given location",
-		})
+		c.JSON(http.StatusNotFound, gin.H{"message": "No attractions found for given location"})
 		return
 	}
-	
+
 	var response []attractionByLocationResponse
-
 	for _, item := range attractions {
-		// calculate average rating
 		avg := averageRating(item.Id, c, a)
-
 		response = append(response, attractionByLocationResponse{
 			Id: item.Id,
 			Name: item.Name,
@@ -248,4 +252,35 @@ func averageRating(attractionId uint, c *gin.Context, a *Api) float64{
 		avg = 0.0
 	}
 	return avg
+}
+
+func selectAllRegionsIds(a *Api, regionId uint) ([]uint, error) {
+	visited := map[uint]bool{}
+	var result []uint
+
+	var collect func(id uint) error
+	collect = func(id uint) error {
+		if visited[id] {
+			return nil
+		}
+		visited[id] = true
+		result = append(result, id)
+
+		children, err := a.Db.Region.SelectAllSubregionsIds(id)
+		if err != nil {
+			return err
+		}
+		for _, childId := range children {
+			if err := collect(childId); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	err := collect(regionId)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
