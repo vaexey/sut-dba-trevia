@@ -19,6 +19,7 @@ import { Route as rootRoute } from './routes/__root'
 const SignupLazyImport = createFileRoute('/signup')()
 const LoginLazyImport = createFileRoute('/login')()
 const AttractionsLazyImport = createFileRoute('/attractions')()
+const AttractionLazyImport = createFileRoute('/attraction')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
@@ -41,6 +42,12 @@ const AttractionsLazyRoute = AttractionsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/attractions.lazy').then((d) => d.Route))
 
+const AttractionLazyRoute = AttractionLazyImport.update({
+  id: '/attraction',
+  path: '/attraction',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/attraction.lazy').then((d) => d.Route))
+
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
@@ -56,6 +63,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/attraction': {
+      id: '/attraction'
+      path: '/attraction'
+      fullPath: '/attraction'
+      preLoaderRoute: typeof AttractionLazyImport
       parentRoute: typeof rootRoute
     }
     '/attractions': {
@@ -86,6 +100,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/attraction': typeof AttractionLazyRoute
   '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
@@ -93,6 +108,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/attraction': typeof AttractionLazyRoute
   '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
@@ -101,6 +117,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/attraction': typeof AttractionLazyRoute
   '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
@@ -108,15 +125,16 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/attractions' | '/login' | '/signup'
+  fullPaths: '/' | '/attraction' | '/attractions' | '/login' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/attractions' | '/login' | '/signup'
-  id: '__root__' | '/' | '/attractions' | '/login' | '/signup'
+  to: '/' | '/attraction' | '/attractions' | '/login' | '/signup'
+  id: '__root__' | '/' | '/attraction' | '/attractions' | '/login' | '/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  AttractionLazyRoute: typeof AttractionLazyRoute
   AttractionsLazyRoute: typeof AttractionsLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   SignupLazyRoute: typeof SignupLazyRoute
@@ -124,6 +142,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  AttractionLazyRoute: AttractionLazyRoute,
   AttractionsLazyRoute: AttractionsLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   SignupLazyRoute: SignupLazyRoute,
@@ -140,6 +159,7 @@ export const routeTree = rootRoute
       "filePath": "__root.jsx",
       "children": [
         "/",
+        "/attraction",
         "/attractions",
         "/login",
         "/signup"
@@ -147,6 +167,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.lazy.jsx"
+    },
+    "/attraction": {
+      "filePath": "attraction.lazy.jsx"
     },
     "/attractions": {
       "filePath": "attractions.lazy.jsx"

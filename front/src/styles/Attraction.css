@@ -1,0 +1,60 @@
+.attraction-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  text-align: center;
+}
+
+.attraction-name {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0;
+  color: #222;
+}
+
+.attraction-info {
+  display: flex;
+}
+
+.attraction-photo img {
+  max-width: 600px;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attraction-rating {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+  max-width: 800px;
+}
+
+.attraction-description {
+  font-size: 1.1rem; /* Set a readable font size */
+  line-height: 1.6; /* Improve readability with proper line spacing */
+  color: #555; /* Use a soft color for the text */
+  margin: 24px; /* Add horizontal spacing */
+  text-align: left; /* Align the text to the left */
+  flex: 1; /* Allow the description to take up remaining space next to the photo */
+}
+
+.comments-section {
+  width: 100%;
+  max-width: 800px;
+  margin-top: 32px;
+  padding: 16px;
+  border-top: 1px solid #ddd;
+  text-align: left;
+}
+
+.comments-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  color: #222;
+}

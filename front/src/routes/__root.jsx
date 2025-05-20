@@ -25,7 +25,7 @@ export const Route = createRootRoute({
           style={{
             height: isNavbarHidden
               ? "calc(100vh - 120px)"
-              : "calc(100vh - 80px)",
+              : "calc(100vh - 180px)",
           }}
         >
           <Outlet />
