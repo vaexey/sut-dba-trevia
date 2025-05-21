@@ -15,6 +15,8 @@ type Database struct {
 	Rating ratingService
 	AttractionType attractionTypeService
 	Comment *commentService
+	CommentReport *commentReportService
+	AttractionReport *AttractionReportService
 }
 
 func NewDatabase(Db *gorm.DB) Database{
@@ -27,6 +29,8 @@ func NewDatabase(Db *gorm.DB) Database{
 		Rating: ratingService{Db: Db},
 		AttractionType: attractionTypeService{Db: Db},
 		Comment: &commentService{Db: Db},
+		CommentReport: &commentReportService{Db: Db},
+		AttractionReport: &AttractionReportService{Db: Db},
 	}
 }
 
@@ -66,5 +70,13 @@ type attractionTypeService struct {
 }
 
 type ratingService struct {
+	Db *gorm.DB
+}
+
+type commentReportService struct {
+	Db *gorm.DB	
+}
+
+type AttractionReportService struct {
 	Db *gorm.DB
 }

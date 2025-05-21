@@ -75,6 +75,10 @@ func main() {
 		api.GET("/attractions/location/:locationId", routes.AttractionByLocation)
 		api.GET("/attractions/funfact", routes.AttractionWithRandomFunFact)
 
+		// reports
+		api.GET("/reports/attractions", routes.AttractionReports)
+		api.GET("/reports/comments", routes.CommentReports)
+
 		api.Use(authMiddleware)
 		{
 			// user
@@ -86,9 +90,13 @@ func main() {
 			// rating
 			api.POST("/rate", routes.CreateRating)
 
-			//comment
+			// comment
 			api.POST("/comments", routes.CreateComment)
 			api.GET("/comments/:attractionId", routes.GetComments)
+
+			// reports
+			api.POST("/reports/attractions", routes.CreateAttractionReport)
+			api.POST("/reports/comments", routes.CreateCommentReport)
 		}
 	}
 
