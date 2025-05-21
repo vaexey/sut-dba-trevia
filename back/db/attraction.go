@@ -1,6 +1,9 @@
 package db
 
-import "back/model"
+import (
+	"back/model"
+	"strings"
+)
 
 func (ah *attractionService) SelectById(id uint) (model.Attraction, error) {
 	var attraction model.Attraction
@@ -45,6 +48,22 @@ func (ah *attractionService) SelectAllWithFunFact() ([]model.Attraction, error) 
 	}
 	return attractionsWithFunFact, nil
 }
+
+func (ah *attractionService) SelectAllByRegionIds(regionIds []uint) ([]model.Attraction, error) {
+	var attractions []model.Attraction
+	err := ah.Db.Where("region_id IN (?)", regionIds).Find(&attractions).Error
+	return attractions, err
+}
+
+func (ah *attractionService) SelectAllByRegionIdsAndCategory(regionIds []uint, category string) ([]model.Attraction, error) {
+	var attractions []model.Attraction
+	err := ah.Db.
+	Joins("JOIN attraction_types ON attraction_types.id = attractions.attraction_type_id").
+	Where("attractions.region_id IN ? AND LOWER(attraction_types.name) = ?", regionIds, strings.ToLower(category)).
+	Find(&attractions).Error
+	return attractions, err
+}
+
 
 func (ah *attractionService) Create(attraction model.Attraction) (uint, error) {
 	result := ah.Db.Create(&attraction)
