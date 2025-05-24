@@ -1,6 +1,7 @@
 import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import "../styles/Auth.css";
+import { loginUser } from "../api/loginApi";
 
 export const Route = createLazyFileRoute("/login")({
   component: Login,
@@ -17,20 +18,7 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch("/api/v1/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
-      }
-
-      const data = await response.json();
+      const data = await loginUser(username, password);
       console.log("Login successful:", data);
 
       localStorage.setItem("token", data.token);

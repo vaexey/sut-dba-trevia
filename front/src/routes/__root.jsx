@@ -7,7 +7,7 @@ import TextLogo from "../components/TextLogo";
 export const Route = createRootRoute({
   component: () => {
     const location = useLocation();
-    const hideNavbarPages = ["/", "/login", "/signup"];
+    const hideNavbarPages = ["/", "/login", "/signup", "/admin", "/mod"];
     const hideUtilButtonsPages = ["/login", "/signup"];
     const isNavbarHidden = hideNavbarPages.includes(location.pathname);
     const areUtilButtonsHidden = hideUtilButtonsPages.includes(

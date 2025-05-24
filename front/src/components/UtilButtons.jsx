@@ -7,23 +7,22 @@ import "../styles/UtilButtons.css";
 
 const UtilButtons = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRoleId, setUserRoleId] = useState(null);
   const [logoutMessage, setLogoutMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    funfact: "",
-    photo: null,
-    location: "",
-    type: "Hotel",
-  });
-  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+      // Fetch user info to get roleId
+      fetch("/api/v1/user", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUserRoleId(data.roleId))
+        .catch(() => setUserRoleId(null));
     }
   }, []);
 
@@ -38,39 +37,6 @@ const UtilButtons = () => {
     window.location.reload();
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handlePhotoChange = (e) => {
-    setFormData((prev) => ({ ...prev, photo: e.target.files[0] }));
-  };
-
-  const handleLocationSearch = async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/v1/locations/search?query=${query}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch locations");
-      }
-      const data = await response.json();
-      setSearchResults(data);
-    } catch (error) {
-      console.error("Error fetching locations:", error);
-      setSearchResults([]);
-    }
-  };
-
-  const handleAddAttraction = () => {
-    console.log("Form Data Submitted:", formData);
-    setShowModal(false);
-  };
-
   return (
     <div className="util-buttons">
       {isLoggedIn ? (
@@ -78,6 +44,20 @@ const UtilButtons = () => {
           <button onClick={() => setShowModal(true)}>
             <FaPlus style={{ marginRight: "0" }} />
           </button>
+          {userRoleId === 3 && (
+            <>
+              <button onClick={() => navigate({ to: "/admin" })}>
+                Admin Panel
+              </button>
+            </>
+          )}
+          {userRoleId === 2 && (
+            <>
+              <button onClick={() => navigate({ to: "/mod" })}>
+                Moderation
+              </button>
+            </>
+          )}
           <button onClick={handleLogout}>
             <FiLogOut /> Logout
           </button>

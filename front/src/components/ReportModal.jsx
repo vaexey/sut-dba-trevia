@@ -16,7 +16,7 @@ const ReportAttractionModal = ({ onClose, onSubmit }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2>Report Attraction</h2>
+        <h2>Report</h2>
         <textarea
           placeholder="Enter your report here..."
           className="report-textbox"

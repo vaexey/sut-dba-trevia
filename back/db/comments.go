@@ -27,3 +27,11 @@ func (cs *commentService) Create(comment model.Comment) (uint, error) {
 	result := cs.Db.Create(&comment)
 	return comment.Id, result.Error
 }
+
+func (cs *commentService) SelectById(id uint) (*model.Comment, error) {
+	var comment model.Comment
+	if err := cs.Db.First(&comment, id).Error; err != nil {
+		return nil, err
+	}
+	return &comment, nil
+}

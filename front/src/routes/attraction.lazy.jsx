@@ -1,6 +1,6 @@
 import { createLazyFileRoute, useRouterState } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
-import ReportAttractionModal from "../components/ReportAttractionModal";
+import ReportAttractionModal from "../components/ReportModal";
 import UserComment from "../components/UserComment";
 import "../styles/Attraction.css";
 
@@ -19,6 +19,8 @@ function AttractionPage() {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showCommentReportModal, setShowCommentReportModal] = useState(false);
+  const [reportedComment, setReportedComment] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -102,7 +104,56 @@ function AttractionPage() {
   const handleReportSubmit = (reportText) => {
     console.log("Report submitted for attraction:", attractionData.id);
     console.log("Report text:", reportText);
-    // Add logic to send the report to the server
+
+    const token = localStorage.getItem("token");
+    const reportData = {
+      AttractionId: attractionData.id,
+      Content: reportText,
+    };
+
+    fetch("/api/v1/reports/attractions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reportData),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.error(err));
+  };
+
+  const handleCommentReport = (comment) => {
+    setReportedComment(comment);
+    setShowCommentReportModal(true);
+  };
+
+  const handleCommentReportSubmit = (reportText) => {
+    console.log("Report submitted for comment:", reportedComment.id);
+    console.log("Report text:", reportText);
+
+    const token = localStorage.getItem("token");
+    const reportData = {
+      CommentId: reportedComment.id,
+      Content: reportText,
+    };
+
+    fetch("/api/v1/reports/comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reportData),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.error(err))
+      .finally(() => {
+        setShowCommentReportModal(false);
+        setReportedComment(null);
+      });
   };
 
   return (
@@ -133,7 +184,16 @@ function AttractionPage() {
             {comments.length > 0 ? (
               comments.map((comment, index) => (
                 <div key={index} className="comment">
-                  <p className="comment-author">{comment.username}</p>
+                  <div className="comment-header">
+                    <span className="comment-author">{comment.username}</span>
+                    <button
+                      className="comment-report-button"
+                      title="Report this comment"
+                      onClick={() => handleCommentReport(comment)}
+                    >
+                      !
+                    </button>
+                  </div>
                   <p className="comment-text">{comment.comment}</p>
                 </div>
               ))
@@ -149,6 +209,12 @@ function AttractionPage() {
         <ReportAttractionModal
           onClose={() => setShowReportModal(false)}
           onSubmit={handleReportSubmit}
+        />
+      )}
+      {showCommentReportModal && reportedComment && (
+        <ReportAttractionModal
+          onClose={() => setShowCommentReportModal(false)}
+          onSubmit={handleCommentReportSubmit}
         />
       )}
     </div>
