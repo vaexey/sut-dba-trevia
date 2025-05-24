@@ -52,3 +52,17 @@
 .auth-link:hover {
   text-decoration: underline;
 }
+
+.auth-error {
+  color: red;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.auth-success {
+  color: green;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}

@@ -15,6 +15,7 @@ type createCommentRequest struct {
 }
 
 type commentResponse struct {
+	Id           uint   `json:"id"`
 	AttractionId uint   `json:"attractionId"`
 	UserId       uint   `json:"userId"`
 	Username     string `json:"username"`
@@ -38,6 +39,7 @@ func (a *Api) GetComments(c *gin.Context) {
 	var resp []commentResponse
 	for _, cm := range comments {
 		resp = append(resp, commentResponse{
+			Id:           cm.Id,
 			AttractionId: cm.AttractionId,
 			UserId:       cm.UserId,
 			Username:     cm.User.Username,

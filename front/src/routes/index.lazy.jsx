@@ -1,8 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-
-import funFactImg from "../assets/funFactBg.png";
-
+import SearchComponent from "../components/SearchComponent";
 import "../styles/Index.css";
 
 export const Route = createLazyFileRoute("/")({
@@ -10,87 +8,70 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
-  const [selectedButton, setSelectedButton] = useState("Wszystko");
-  const [funFactBackground, setFunFactBackground] = useState("");
+  const [selectedButton, setSelectedButton] = useState("All");
+  const [funFactData, setFunFactData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    const searchValue = event.target.search.value;
-    console.log("Search value:", searchValue);
-  };
-
-  const handleButtonClick = (buttonName) => {
-    setSelectedButton(buttonName);
-  };
-
-  //todo: integrate with api
   useEffect(() => {
-    const fetchBackgroundImage = async () => {
-      setIsLoading(true);
+    const fetchFunFactData = async () => {
+      try {
+        setIsLoading(true);
 
-      const response = funFactImg;
+        const response = await fetch("/api/v1/attractions/funfact");
+        if (!response.ok) {
+          throw new Error("Failed to fetch fun fact data.");
+        }
 
-      setFunFactBackground(response);
-      setIsLoading(false);
+        const data = await response.json();
+
+        const formattedData = {
+          ...data,
+          photo: `data:image/jpeg;base64,${btoa(
+            data.photo
+              .replace(/\\x/g, "")
+              .match(/.{1,2}/g)
+              .map((byte) => String.fromCharCode(parseInt(byte, 16)))
+              .join(""),
+          )}`,
+        };
+
+        setFunFactData(formattedData);
+      } catch (error) {
+        console.error("Error fetching fun fact data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    fetchBackgroundImage();
+    fetchFunFactData();
   }, []);
 
   return (
     <div className="home-area">
       <div className="home-search-area">
-        <div className="buttons">
-          <button
-            className={selectedButton === "Wszystko" ? "active" : "nonactive"}
-            onClick={() => handleButtonClick("Wszystko")}
-          >
-            Wszystko
-          </button>
-          <button
-            className={selectedButton === "Hotele" ? "active" : "nonactive"}
-            onClick={() => handleButtonClick("Hotele")}
-          >
-            Hotele
-          </button>
-          <button
-            className={
-              selectedButton === "Restauracje" ? "active" : "nonactive"
-            }
-            onClick={() => handleButtonClick("Restauracje")}
-          >
-            Restauracje
-          </button>
-          <button
-            className={selectedButton === "Inne" ? "active" : "nonactive"}
-            onClick={() => handleButtonClick("Inne")}
-          >
-            Inne
-          </button>
-        </div>
-        <form onSubmit={handleSearch}>
-          <input type="text" name="search" placeholder="Search..." />
-          <button type="submit">➤</button>
-        </form>
+        <SearchComponent
+          selectedButton={selectedButton}
+          setSelectedButton={setSelectedButton}
+        />
       </div>
-      <div
-        className="home-fun-fact-area"
-        style={{
-          backgroundImage: isLoading ? "none" : `url(${funFactBackground})`,
-        }}
-      >
-        <div className="fun-fact-content">
-          <p className="fun-fact-title">Eiffel Tower</p>
-          <p className="fun-fact-location">Paris, France</p>
-          <p className="fun-fact-description">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Amet
-            consectetur adipiscing elit quisque faucibus ex sapien. Quisque
-            faucibus ex sapien vitae pellentesque sem placerat. Vitae
-            pellentesque sem placerat in id cursus mi.
-          </p>
+
+      {isLoading ? (
+        <p>Loading fun fact...</p>
+      ) : funFactData ? (
+        <div className="home-fun-fact-area">
+          <div className="fun-fact-content">
+            <p className="fun-fact-title">{funFactData.name}</p>
+            <p className="fun-fact-description">{funFactData.funfact}</p>
+          </div>
+          <div className="fun-fact-photo">
+            <img src={funFactData.photo} alt={funFactData.name} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <p>Failed to load fun fact.</p>
+      )}
     </div>
   );
 }
+
+export default Index;

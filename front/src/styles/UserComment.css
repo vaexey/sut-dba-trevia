@@ -1,0 +1,35 @@
+.user-comment {
+  position: relative;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-textbox {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+.comment-submit-button {
+  position: absolute;
+  top: 25%;
+  right: 8px;
+  height: 50%;
+  align-self: flex-end;
+  padding: 0.5rem 1rem;
+  background-color: #047500a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.comment-submit-button:hover {
+  background-color: #023300a1;
+}

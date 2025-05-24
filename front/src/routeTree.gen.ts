@@ -18,6 +18,9 @@ import { Route as rootRoute } from './routes/__root'
 
 const SignupLazyImport = createFileRoute('/signup')()
 const LoginLazyImport = createFileRoute('/login')()
+const AttractionsLazyImport = createFileRoute('/attractions')()
+const AttractionLazyImport = createFileRoute('/attraction')()
+const AdminLazyImport = createFileRoute('/admin')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
@@ -34,6 +37,24 @@ const LoginLazyRoute = LoginLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 
+const AttractionsLazyRoute = AttractionsLazyImport.update({
+  id: '/attractions',
+  path: '/attractions',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/attractions.lazy').then((d) => d.Route))
+
+const AttractionLazyRoute = AttractionLazyImport.update({
+  id: '/attraction',
+  path: '/attraction',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/attraction.lazy').then((d) => d.Route))
+
+const AdminLazyRoute = AdminLazyImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/admin.lazy').then((d) => d.Route))
+
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
@@ -49,6 +70,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/attraction': {
+      id: '/attraction'
+      path: '/attraction'
+      fullPath: '/attraction'
+      preLoaderRoute: typeof AttractionLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/attractions': {
+      id: '/attractions'
+      path: '/attractions'
+      fullPath: '/attractions'
+      preLoaderRoute: typeof AttractionsLazyImport
       parentRoute: typeof rootRoute
     }
     '/login': {
@@ -72,12 +114,18 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/admin': typeof AdminLazyRoute
+  '/attraction': typeof AttractionLazyRoute
+  '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/admin': typeof AdminLazyRoute
+  '/attraction': typeof AttractionLazyRoute
+  '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
 }
@@ -85,27 +133,49 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/admin': typeof AdminLazyRoute
+  '/attraction': typeof AttractionLazyRoute
+  '/attractions': typeof AttractionsLazyRoute
   '/login': typeof LoginLazyRoute
   '/signup': typeof SignupLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/attraction'
+    | '/attractions'
+    | '/login'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup'
-  id: '__root__' | '/' | '/login' | '/signup'
+  to: '/' | '/admin' | '/attraction' | '/attractions' | '/login' | '/signup'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/attraction'
+    | '/attractions'
+    | '/login'
+    | '/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  AdminLazyRoute: typeof AdminLazyRoute
+  AttractionLazyRoute: typeof AttractionLazyRoute
+  AttractionsLazyRoute: typeof AttractionsLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   SignupLazyRoute: typeof SignupLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  AdminLazyRoute: AdminLazyRoute,
+  AttractionLazyRoute: AttractionLazyRoute,
+  AttractionsLazyRoute: AttractionsLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   SignupLazyRoute: SignupLazyRoute,
 }
@@ -121,12 +191,24 @@ export const routeTree = rootRoute
       "filePath": "__root.jsx",
       "children": [
         "/",
+        "/admin",
+        "/attraction",
+        "/attractions",
         "/login",
         "/signup"
       ]
     },
     "/": {
       "filePath": "index.lazy.jsx"
+    },
+    "/admin": {
+      "filePath": "admin.lazy.jsx"
+    },
+    "/attraction": {
+      "filePath": "attraction.lazy.jsx"
+    },
+    "/attractions": {
+      "filePath": "attractions.lazy.jsx"
     },
     "/login": {
       "filePath": "login.lazy.jsx"
