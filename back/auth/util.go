@@ -28,7 +28,7 @@ func ContextRole(c *gin.Context) string {
 
 func ContextIsModerator(c *gin.Context) bool {
 	role := ContextRole(c)
-	return role == "moderator"
+	return role == "moderator" || role == "admin"
 }
 
 func ContextIsAdmin(c *gin.Context) bool {

@@ -64,6 +64,22 @@ func (ah *attractionService) SelectAllByRegionIdsAndCategory(regionIds []uint, c
 	return attractions, err
 }
 
+func (ah *attractionService) SelectAttractionsWithMostComments(numberOfAttractions int) ([]model.Attraction, error) {
+	var attractions []model.Attraction
+		err := ah.Db.
+		Model(&model.Attraction{}).
+		Select("attractions.*, COUNT(comments.id) as comment_count").
+		Joins("LEFT JOIN comments ON comments.attraction_id = attractions.id").
+		Group("attractions.id").
+		Having("COUNT(comments.id) > 0").
+		Order("comment_count DESC").
+		Limit(numberOfAttractions).
+		Find(&attractions).Error
+	if err != nil {
+		return nil, err
+	}
+	return attractions, nil
+}
 
 func (ah *attractionService) Create(attraction model.Attraction) (uint, error) {
 	result := ah.Db.Create(&attraction)
