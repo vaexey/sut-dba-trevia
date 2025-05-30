@@ -23,6 +23,32 @@ func (cs *commentService) SelectAllByAttractionId(attractionId uint) ([]model.Co
 	return comments, nil
 }
 
+func (cs *commentService) CountCommentsByAttractionId(attractionId uint) (uint, error) {
+	var count int64
+	err := cs.Db.
+		Model(&model.Comment{}).
+		Where("attraction_id = ?", attractionId).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+	return uint(count), nil
+}
+
+func (cs *commentService) CountCommentsByUserId(userId uint) (uint, error) {
+	var count int64
+	err := cs.Db.
+		Model(&model.Comment{}).
+		Where("user_id = ?", userId).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+	return uint(count), nil
+}
+
 func (cs *commentService) Create(comment model.Comment) (uint, error) {
 	result := cs.Db.Create(&comment)
 	return comment.Id, result.Error

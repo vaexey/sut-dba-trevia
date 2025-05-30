@@ -75,9 +75,6 @@ func main() {
 		api.GET("/attractions/location/:locationId", routes.AttractionByLocation)
 		api.GET("/attractions/funfact", routes.AttractionWithRandomFunFact)
 
-		// reports
-		api.GET("/reports/attractions", routes.AttractionReports)
-		api.GET("/reports/comments", routes.CommentReports)
 
 		api.Use(authMiddleware)
 		{
@@ -97,6 +94,11 @@ func main() {
 			// reports
 			api.POST("/reports/attractions", routes.CreateAttractionReport)
 			api.POST("/reports/comments", routes.CreateCommentReport)
+			api.GET("/reports/attractions", authHandler.RequireModerator(), routes.AttractionReports)
+			api.GET("/reports/comments", authHandler.RequireModerator(), routes.CommentReports)
+
+			// stats 
+			api.GET("/stats", authHandler.RequireAdmin(), routes.Stats)
 		}
 	}
 
