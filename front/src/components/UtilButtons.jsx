@@ -26,6 +26,29 @@ const UtilButtons = () => {
     }
   }, []);
 
+  const handleStatsDownload = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("/api/v1/stats", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch stats PDF");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "stats.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert("Could not download stats PDF.");
+    }
+  };
+
   const handleLogin = () => {
     setIsLoggedIn(true);
     navigate({ to: "/login" });
@@ -49,13 +72,12 @@ const UtilButtons = () => {
               <button onClick={() => navigate({ to: "/admin" })}>
                 Admin Panel
               </button>
+              <button onClick={handleStatsDownload}>Stats</button>
             </>
           )}
           {userRoleId === 2 && (
             <>
-              <button onClick={() => navigate({ to: "/mod" })}>
-                Moderation
-              </button>
+              <button onClick={handleStatsDownload}>Moderation</button>
             </>
           )}
           <button onClick={handleLogout}>
