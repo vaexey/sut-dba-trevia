@@ -9,12 +9,12 @@ import (
 )
 
 type statsAttractionResponse struct {
-	Name string 
+	Name             string
 	NumberOfComments uint
 }
 
 type statsUserResponse struct {
-	Name string 
+	Name             string
 	NumberOfComments uint
 }
 
@@ -54,7 +54,7 @@ func (a *Api) Stats(c *gin.Context) {
 	// users
 	pdf.Ln(10)
 	pdf.SetFont("Arial", "B", 14)
-	pdf.Cell(40, 10, "Top 5 Attractions by Number of Comments")
+	pdf.Cell(40, 10, "Top 5 Users by Number of Comments")
 	pdf.Ln(12)
 	pdf.SetFont("Arial", "", 12)
 	for _, item := range users {
@@ -89,7 +89,7 @@ func userRecordNumber(c *gin.Context) (int, error) {
 	return number, err
 }
 
-func recordsNumber(c *gin.Context)  (int, int){
+func recordsNumber(c *gin.Context) (int, int) {
 	defaultValue := 5
 	numberOfAttractionRecords, attractionErr := attractionRecordNumber(c)
 	numberOfUserRecords, userErr := userRecordNumber(c)
