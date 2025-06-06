@@ -17,7 +17,7 @@ docker -v
 Run
 
 ```
-docker-compose up --build
+docker compose up --build
 ```
 
 Dispose
